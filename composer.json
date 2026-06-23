@@ -48,6 +48,6 @@
         "issues": "https://github.com/rstacode/otpiq/issues",
         "source": "https://github.com/rstacode/otpiq"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true
 }
