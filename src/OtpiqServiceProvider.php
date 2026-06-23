@@ -15,8 +15,8 @@ class OtpiqServiceProvider extends ServiceProvider
 
         $this->app->singleton(OtpiqService::class, function ($app) {
             return new OtpiqService(
-                config('otpiq.api_key'),
-                config('otpiq.base_url')
+                config('otpiq.api_key', ''),
+                config('otpiq.base_url', 'https://api.otpiq.com/api/')
             );
         });
     }
