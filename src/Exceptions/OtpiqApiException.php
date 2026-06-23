@@ -59,10 +59,9 @@ class OtpiqApiException extends Exception
 
     public function isCreditError(): bool
     {
-        $message = strtolower($this->getMessage());
-        return str_contains($message, 'credit') ||
-            str_contains($message, 'insufficient') ||
-            isset($this->responseData['yourCredit']);
+        return $this->messageContains('credit') ||
+            $this->messageContains('insufficient') ||
+            $this->hasResponseKey('yourCredit');
     }
 
     public function isAuthError(): bool
@@ -82,19 +81,17 @@ class OtpiqApiException extends Exception
 
     public function isTrialModeError(): bool
     {
-        $message = strtolower($this->getMessage());
-        return str_contains($message, 'trial mode');
+        return $this->messageContains('trial mode');
     }
 
     public function isSpendingThresholdError(): bool
     {
-        return isset($this->responseData['spendingThreshold']);
+        return $this->hasResponseKey('spendingThreshold');
     }
 
     public function isSenderIdError(): bool
     {
-        $message = strtolower($this->getMessage());
-        return str_contains($message, 'senderid');
+        return $this->messageContains('senderid');
     }
 
     public function getFirstError(): ?string
@@ -109,18 +106,32 @@ class OtpiqApiException extends Exception
 
     public function getRemainingCredit(): ?int
     {
-        return $this->responseData['yourCredit'] ??
-            $this->responseData['remainingCredit'] ??
-            null;
+        return $this->getResponseValue('yourCredit') ??
+            $this->getResponseValue('remainingCredit');
     }
 
     public function getRequiredCredit(): ?int
     {
-        return $this->responseData['requiredCredit'] ?? null;
+        return $this->getResponseValue('requiredCredit');
     }
 
     public function getRateLimitWaitMinutes(): ?int
     {
-        return $this->responseData['waitMinutes'] ?? null;
+        return $this->getResponseValue('waitMinutes');
+    }
+
+    protected function messageContains(string $keyword): bool
+    {
+        return str_contains(strtolower($this->getMessage()), $keyword);
+    }
+
+    protected function hasResponseKey(string $key): bool
+    {
+        return isset($this->responseData[$key]);
+    }
+
+    protected function getResponseValue(string $key, mixed $default = null): mixed
+    {
+        return $this->responseData[$key] ?? $default;
     }
 }
