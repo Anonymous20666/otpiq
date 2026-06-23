@@ -14,6 +14,12 @@ class OtpiqService
 
     public function __construct(string $apiKey, string $baseUrl = 'https://api.otpiq.com/api/')
     {
+        if (empty($apiKey)) {
+            throw new \InvalidArgumentException(
+                'OTPIQ API key is required. Set OTPIQ_API_KEY in your .env file.'
+            );
+        }
+
         $this->apiKey = $apiKey;
         $this->baseUrl = rtrim($baseUrl, '/') . '/';
         $this->client = new Client([
@@ -53,7 +59,17 @@ class OtpiqService
             $options = $method === 'POST' && !empty($data) ? ['json' => $data] : [];
             $response = $this->client->request($method, $uri, $options);
 
-            return json_decode($response->getBody()->getContents(), true) ?? [];
+            $contents = $response->getBody()->getContents();
+            $decoded = json_decode($contents, true);
+
+            if (!is_array($decoded)) {
+                throw new OtpiqApiException(
+                    'OTPIQ API Error: Invalid JSON response from API',
+                    $response->getStatusCode()
+                );
+            }
+
+            return $decoded;
         } catch (GuzzleException $e) {
             throw OtpiqApiException::fromGuzzleException($e);
         }
