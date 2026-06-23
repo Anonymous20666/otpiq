@@ -30,7 +30,7 @@ class OtpiqApiException extends Exception
         $errors = [];
         $responseData = null;
 
-        if ($e->hasResponse()) {
+        if (method_exists($e, 'hasResponse') && $e->hasResponse()) {
             $response = $e->getResponse();
             $body = json_decode($response->getBody()->getContents(), true) ?? [];
             $responseData = $body;
