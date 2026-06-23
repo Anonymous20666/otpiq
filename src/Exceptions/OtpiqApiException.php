@@ -25,7 +25,7 @@ class OtpiqApiException extends Exception
 
     public static function fromGuzzleException(GuzzleException $e): self
     {
-        $message = $e->getMessage();
+        $message = 'An error occurred while communicating with the OTPIQ API.';
         $code = 0;
         $errors = [];
         $responseData = null;
